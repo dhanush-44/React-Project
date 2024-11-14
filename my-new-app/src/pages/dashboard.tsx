@@ -7,7 +7,7 @@ const Dashboard = () => {
             <Header />
             <main className="flex-grow p-4 md:p-6 lg:p-8 bg-gray-50">
                 <section className="container mx-auto">
-                    <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-center font-semibold text-gray-800 mb-6">
+                    <h1 className="text-xl sm:text-xl md:text-2xl lg:text-2xl text-center font-semibold text-gray-800 mb-6">
                         Welcome to the Dashboard
                     </h1>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

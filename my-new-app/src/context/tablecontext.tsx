@@ -12,6 +12,7 @@ interface TableContextType {
   tableData: TableRow[];
   deleteRow: (id: number) => void;
   editRow: (id: number, updatedRow: TableRow) => void;
+  addRow: (newRow: TableRow) => void; 
 }
 
 const TableContext = createContext<TableContextType | undefined>(undefined);
@@ -23,7 +24,7 @@ export const TableProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     { id: 3, col1: "Sundar", col2: "sundar@example.com", col3: "User", col4: "6789768754" },
     { id: 4, col1: "Deepak", col2: "deepak@example.com", col3: "User", col4: "8967456754" },
     { id: 5, col1: "Pradeep", col2: "prdeep@example.com", col3: "User", col4: "8756784569" },
-    { id: 6, col1: "Dhanush", col2: "dhanush@example.com", col3: "Admin", col4: "7687686567"},
+    { id: 6, col1: "Dhanush", col2: "dhanush@example.com", col3: "Admin", col4: "7687686567" },
     { id: 7, col1: "Chinmay", col2: "chinmay@example.com", col3: "Moderator", col4: "7865765435" },
     { id: 8, col1: "Karthik", col2: "karthik@example.com", col3: "User", col4: "9878675463" },
   ]);
@@ -38,8 +39,20 @@ export const TableProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     );
   };
 
+  // const addRow = (newRow: TableRow) => {
+  //   setTableData((prev) => [...prev, newRow]);
+  // };
+
+  const addRow = (newRow: TableRow) => {
+    const newId = tableData.length > 0 ? Math.max(...tableData.map((row) => row.id)) + 1 : 1;
+    const rowWithId: TableRow = { ...newRow, id: newId };
+    setTableData((prev) => [...prev, rowWithId]);
+  };
+  
+  
+
   return (
-    <TableContext.Provider value={{ tableData, deleteRow, editRow }}>
+    <TableContext.Provider value={{ tableData, deleteRow, editRow, addRow }}>
       {children}
     </TableContext.Provider>
   );

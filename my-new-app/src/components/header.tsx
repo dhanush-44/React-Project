@@ -1,11 +1,22 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from 'react-router-dom';
 import { FaUserCircle } from "react-icons/fa";
+import { useLoading } from '../context/loadingcontext';
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const navigate = useNavigate();
+    const { setLoadingState } = useLoading();
+
+    const navigateWithDelay = (to: string) => {
+        setLoadingState(true);
+        setTimeout(() => {
+            setLoadingState(false); 
+            navigate(to); 
+        }, 2000); 
+    };
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
     const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -56,10 +67,30 @@ const Header = () => {
                 </div>
 
                 <div className="hidden lg:flex absolute right-20 space-x-8 mx-8">
-                    <Link to="/dashboard" className="font-medium text-gray-800 hover:text-blue-700">Dashboard</Link>
-                    <Link to="/home" className="font-medium text-gray-800 hover:text-blue-700">Edit Users</Link>
-                    <Link to="/users" className="font-medium text-gray-800 hover:text-blue-700">Users List</Link>
-                    <Link to="/" className="font-medium text-gray-800 hover:text-blue-700">Logout</Link>
+                    <button
+                        onClick={() => navigateWithDelay('/dashboard')}
+                        className="font-medium text-gray-800 hover:text-blue-700"
+                    >
+                        Dashboard
+                    </button>
+                    <button
+                        onClick={() => navigateWithDelay('/home')}
+                        className="font-medium text-gray-800 hover:text-blue-700"
+                    >
+                        Edit Users
+                    </button>
+                    <button
+                        onClick={() => navigateWithDelay('/users')} 
+                        className="font-medium text-gray-800 hover:text-blue-700"
+                    >
+                        Users List
+                    </button>
+                    <button
+                        onClick={() => navigateWithDelay('/')}
+                        className="font-medium text-gray-800 hover:text-blue-700"
+                    >
+                        Logout
+                    </button>
                 </div>
 
                 <div className="hidden lg:inline relative ml-auto">
@@ -114,35 +145,37 @@ const Header = () => {
 
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center">
-                    <div className="bg-indigo-100 p-8 rounded-lg shadow-lg max-w-sm w-full">
-                        <h2 className="text-2xl text-center font-semibold text-gray-800 mb-4">Change Password</h2>
+                    <div className="bg-indigo-100 p-8 rounded-lg shadow-lg max-w-2xl w-full">
+                        <h2 className="text-2xl text-center font-bold text-gray-800 mb-4">Change Password</h2>
                         <form>
-                            <div className="mb-4">
-                                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    placeholder="Enter your email"
-                                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="old-password" className="block text-sm font-medium text-gray-700">Old Password</label>
-                                <input
-                                    type="password"
-                                    id="old-password"
-                                    placeholder="Enter your old password"
-                                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="new-password" className="block text-sm font-medium text-gray-700">New Password</label>
-                                <input
-                                    type="password"
-                                    id="new-password"
-                                    placeholder="Enter your new password"
-                                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                                />
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div className="mb-4">
+                                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        placeholder="Enter your email"
+                                        className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                </div>
+                                <div className="mb-4">
+                                    <label htmlFor="old-password" className="block text-sm font-medium text-gray-700">Old Password</label>
+                                    <input
+                                        type="password"
+                                        id="old-password"
+                                        placeholder="Enter old password"
+                                        className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                </div>
+                                <div className="mb-4">
+                                    <label htmlFor="new-password" className="block text-sm font-medium text-gray-700">New Password</label>
+                                    <input
+                                        type="password"
+                                        id="new-password"
+                                        placeholder="Enter new password"
+                                        className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                </div>
                             </div>
                             <button
                                 type="submit"

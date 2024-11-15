@@ -8,13 +8,12 @@ import { useForm, Controller } from "react-hook-form";
 
 const Home = () => {
   const { tableData, deleteRow, editRow, addRow } = useTableContext();
-
+  const { control, handleSubmit, formState: { errors }, reset } = useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRow, setEditingRow] = useState<TableRow | null>(null);
   const [isAddMode, setIsAddMode] = useState(false);
   const [isViewMode, setIsViewMode] = useState(false);
-
-  const { control, handleSubmit, formState: { errors } } = useForm();
+  
   const saveButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const handleDelete = (id: number) => {
@@ -51,24 +50,25 @@ const Home = () => {
 
   const handleModalClose = () => {
     setIsModalOpen(false);
-    setEditingRow(null);
-    setIsViewMode(false);
+    setEditingRow(null); 
+    setIsViewMode(false); 
+    reset();
   };
 
-  const onSubmit = (data: any) => {
+  const onSubmit = () => {
     if (editingRow) {
       if (isAddMode) {
         const newRow: TableRow = {
-          id: Date.now(),
-          col1: data.name,
-          col2: data.email,
-          col3: data.role,
-          col4: data.mobile,
+          id: 999,
+          col1: editingRow.col1,
+          col2: editingRow.col2,
+          col3: editingRow.col3,
+          col4: editingRow.col4,
         };
         addRow(newRow);
         toast.success("Successfully Added!");
       } else {
-        editRow(editingRow.id, data);
+        editRow(editingRow.id, editingRow);
         toast.success("Successfully Updated!");
       }
       handleModalClose();
@@ -254,5 +254,6 @@ const Home = () => {
     </div>
   );
 };
+
 
 export default Home;

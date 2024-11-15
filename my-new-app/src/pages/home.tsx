@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { useTableContext } from "../context/tablecontext";
@@ -12,6 +12,13 @@ const Home = () => {
   const [editingRow, setEditingRow] = useState<TableRow | null>(null);
   const [isAddMode, setIsAddMode] = useState(false);
   const [isViewMode, setIsViewMode] = useState(false);
+
+  const nameRef = useRef<HTMLInputElement | null>(null);
+  const emailRef = useRef<HTMLInputElement | null>(null);
+  const roleRef = useRef<HTMLSelectElement | null>(null);
+  const mobileRef = useRef<HTMLInputElement | null>(null);
+  const saveButtonRef = useRef<HTMLButtonElement | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const handleDelete = (id: number) => {
     deleteRow(id);
@@ -33,7 +40,7 @@ const Home = () => {
       col3: "",
       col4: "",
     });
-  
+
     setIsAddMode(true);
     setIsViewMode(false);
     setIsModalOpen(true);
@@ -62,25 +69,53 @@ const Home = () => {
           col3: editingRow.col3,
           col4: editingRow.col4,
         };
-        
-        // console.log("Adding row:", newRow);
+
         addRow(newRow);
         toast.success("Successfully Added!");
       } else {
-        // console.log("Editing row:", editingRow);
         editRow(editingRow.id, editingRow);
-        toast.success("Successfully Updated!"); 
+        toast.success("Successfully Updated!");
       }
       handleModalClose();
     }
   };
-  
+
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
     col: keyof TableRow
   ) => {
-    if (editingRow) {
-      setEditingRow({ ...editingRow, [col]: e.target.value });
+    const { value } = e.target;
+  
+    if (col === "col4") {
+      if (/^\d*$/.test(value)) {
+        setEditingRow({ ...editingRow!, [col]: value });
+      } else {
+        toast.error("Mobile number must be numeric!");
+      }
+    } else {
+      setEditingRow({ ...editingRow!, [col]: value });
+    }
+  };
+
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement | HTMLSelectElement>,
+    nextField: React.RefObject<HTMLInputElement | HTMLSelectElement | null>,
+    isLastField: boolean
+  ) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+
+      if (isViewMode) {
+        if (isLastField && closeButtonRef.current) {
+          closeButtonRef.current.focus();
+        }
+      } else {
+        if (isLastField && saveButtonRef.current) {
+          saveButtonRef.current.focus();
+        } else if (nextField.current) {
+          nextField.current.focus(); 
+        }
+      }
     }
   };
 
@@ -103,26 +138,16 @@ const Home = () => {
               Add User
             </button>
           </div>
-          
+
           <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
             <table className="w-full text-sm text-left rtl:text-right text-gray-700">
               <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                 <tr>
-                  <th scope="col" className="px-6 py-3">
-                    Name
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Email
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Role
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Mobile Number
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Actions
-                  </th>
+                  <th scope="col" className="px-6 py-3">Name</th>
+                  <th scope="col" className="px-6 py-3">Email</th>
+                  <th scope="col" className="px-6 py-3">Role</th>
+                  <th scope="col" className="px-6 py-3">Mobile Number</th>
+                  <th scope="col" className="px-6 py-3">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -137,11 +162,11 @@ const Home = () => {
                     <td className="px-6 py-4">
                       <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline" onClick={() => handleEdit(row)}>
                         Edit
-                      </a>{" "} 
+                      </a>{" "}
                       /{" "}
                       <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline" onClick={() => handleView(row)}>
                         View
-                      </a>{" "} 
+                      </a>{" "}
                       /{" "}
                       <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline" onClick={() => handleDelete(row.id)}>
                         Delete
@@ -165,10 +190,12 @@ const Home = () => {
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700">Name</label>
                   <input
+                    ref={nameRef}
                     type="text"
                     value={editingRow?.col1}
                     onChange={(e) => handleInputChange(e, "col1")}
                     disabled={isViewMode}
+                    onKeyDown={(e) => handleKeyDown(e, emailRef, false)}
                     className="w-full p-2 border rounded-md"
                   />
                 </div>
@@ -176,32 +203,42 @@ const Home = () => {
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700">Email</label>
                   <input
+                    ref={emailRef}
                     type="text"
                     value={editingRow?.col2}
                     onChange={(e) => handleInputChange(e, "col2")}
                     disabled={isViewMode}
+                    onKeyDown={(e) => handleKeyDown(e, roleRef, false)}
                     className="w-full p-2 border rounded-md"
                   />
                 </div>
 
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700">Role</label>
-                  <input
-                    type="text"
+                  <select
+                    ref={roleRef}
                     value={editingRow?.col3}
                     onChange={(e) => handleInputChange(e, "col3")}
                     disabled={isViewMode}
+                    onKeyDown={(e) => handleKeyDown(e, mobileRef, false)}
                     className="w-full p-2 border rounded-md"
-                  />
+                  >
+                    <option value="" disabled>Select a role</option>
+                    <option value="Admin">Admin</option>
+                    <option value="User">User</option>
+                    <option value="Moderator">Moderator</option>
+                  </select>
                 </div>
 
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700">Mobile Number</label>
                   <input
+                    ref={mobileRef}
                     type="text"
                     value={editingRow?.col4}
                     onChange={(e) => handleInputChange(e, "col4")}
-                    disabled={isViewMode} 
+                    onKeyDown={(e) => handleKeyDown(e, mobileRef, true)}
+                    disabled={isViewMode}
                     className="w-full p-2 border rounded-md"
                   />
                 </div>
@@ -210,6 +247,7 @@ const Home = () => {
               <div className="flex-start space-x-4 mt-4">
                 {!isViewMode && (
                   <button
+                    ref={saveButtonRef}
                     onClick={handleSave}
                     className="bg-indigo-500 text-white hover:bg-indigo-700 py-2 px-4 rounded"
                   >
@@ -217,6 +255,7 @@ const Home = () => {
                   </button>
                 )}
                 <button
+                ref={closeButtonRef}
                   onClick={handleModalClose}
                   className="bg-indigo-500 text-white hover:bg-indigo-700 py-2 px-4 rounded"
                 >
